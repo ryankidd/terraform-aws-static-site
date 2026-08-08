@@ -38,6 +38,8 @@ module "site" {
 }
 ```
 
+See [`examples/`](examples) for complete, runnable configurations.
+
 ## Inputs
 
 | Name | Description | Type | Default |
