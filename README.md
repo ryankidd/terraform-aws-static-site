@@ -19,8 +19,24 @@ module "site" {
 Early and under active development. Currently provisions a private S3
 bucket (versioned, public access blocked) fronted by a CloudFront
 distribution using Origin Access Control, so the bucket stays private and
-is only readable through CloudFront. Custom domain support and CI are in
-progress.
+is only readable through CloudFront. Custom domains are supported by
+passing an existing ACM certificate; CI is in progress.
+
+### Custom domain
+
+CloudFront only accepts ACM certificates issued in `us-east-1`, so this
+module expects the certificate to already exist (create it with a provider
+alias in the calling configuration) rather than provisioning one itself:
+
+```hcl
+module "site" {
+  source = "github.com/ryankidd/terraform-aws-static-site"
+
+  bucket_name          = "my-static-site"
+  domain_aliases       = ["www.example.com"]
+  acm_certificate_arn  = aws_acm_certificate.site.arn # must be in us-east-1
+}
+```
 
 ## Inputs
 
@@ -30,6 +46,8 @@ progress.
 | `tags` | Tags applied to all resources created by this module. | `map(string)` | `{}` |
 | `default_root_object` | Object CloudFront returns for requests to the distribution root. | `string` | `"index.html"` |
 | `price_class` | CloudFront price class controlling which edge locations serve the distribution. | `string` | `"PriceClass_100"` |
+| `domain_aliases` | Custom domain names (CNAMEs) the distribution should respond to. Requires `acm_certificate_arn`. | `list(string)` | `[]` |
+| `acm_certificate_arn` | ARN of an existing ACM certificate covering `domain_aliases`, issued in `us-east-1`. | `string` | `null` |
 
 ## Outputs
 
