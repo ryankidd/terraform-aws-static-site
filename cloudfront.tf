@@ -10,6 +10,7 @@ resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   default_root_object = var.default_root_object
   price_class         = var.price_class
+  aliases             = var.domain_aliases
   tags                = var.tags
 
   origin {
@@ -41,6 +42,16 @@ resource "aws_cloudfront_distribution" "site" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = var.acm_certificate_arn == null
+    acm_certificate_arn            = var.acm_certificate_arn
+    ssl_support_method             = var.acm_certificate_arn == null ? null : "sni-only"
+    minimum_protocol_version       = var.acm_certificate_arn == null ? null : "TLSv1.2_2021"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length(var.domain_aliases) == 0 || var.acm_certificate_arn != null
+      error_message = "acm_certificate_arn must be set when domain_aliases is non-empty."
+    }
   }
 }
