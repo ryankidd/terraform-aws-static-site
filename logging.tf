@@ -1,4 +1,9 @@
 resource "aws_s3_bucket" "logs" {
+  #checkov:skip=CKV_AWS_144:Single-region bucket by design; replication is unnecessary for a log destination that already expires objects after 90 days.
+  #checkov:skip=CKV_AWS_145:Objects get default SSE-S3 encryption; requiring a customer-managed KMS key adds cost and rotation overhead this module doesn't assume by default.
+  #checkov:skip=CKV2_AWS_62:No event-driven processing pipeline in scope for the log bucket.
+  #checkov:skip=CKV_AWS_21:Log objects are write-once and expired via the lifecycle rule below; version history adds no value here.
+  #checkov:skip=CKV_AWS_18:This is already the log destination bucket; enabling access logging on it would be circular.
   count  = var.enable_logging ? 1 : 0
   bucket = "${var.bucket_name}-logs"
   tags   = var.tags
@@ -34,6 +39,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
 # so the destination bucket needs ACLs enabled rather than the
 # bucket-owner-enforced default.
 resource "aws_s3_bucket_ownership_controls" "logs" {
+  #checkov:skip=CKV2_AWS_65:ACLs are intentionally enabled on this bucket; CloudFront's standard access-logging delivery requires ACL-based grants on the destination bucket.
   count  = var.enable_logging ? 1 : 0
   bucket = aws_s3_bucket.logs[0].id
 
