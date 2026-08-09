@@ -24,6 +24,31 @@ adds baseline security headers by default. Custom domains and CloudFront
 access logging are both supported and variable-gated. CI runs formatting,
 validation, linting, and a Checkov security scan on every push.
 
+## Usage
+
+1. Add the module to your configuration, setting at least `bucket_name`
+   (it must be globally unique):
+
+   ```hcl
+   module "site" {
+     source = "github.com/ryankidd/terraform-aws-static-site"
+
+     bucket_name = "my-static-site"
+   }
+   ```
+
+2. Run `terraform init` and `terraform apply`.
+3. Upload your site's files into the bucket (`module.site.bucket_id`), for
+   example with `aws s3 sync ./dist s3://my-static-site`.
+4. Serve the site from `module.site.distribution_domain_name`, or from
+   a custom domain — see below.
+
+Requests to paths without a file extension resolve to
+`var.default_root_object` (`index.html` by default) only at the
+distribution root; this module doesn't configure per-directory index
+documents or a 404 rewrite, so a single-page app needs its own error
+response handling in front of the distribution.
+
 ### Custom domain
 
 CloudFront only accepts ACM certificates issued in `us-east-1`, so this
@@ -57,6 +82,13 @@ module "site" {
 ```
 
 See [`examples/`](examples) for complete, runnable configurations.
+
+## Requirements
+
+| Name | Version |
+|---|---|
+| terraform | >= 1.5 |
+| aws | >= 5.0 |
 
 ## Inputs
 
