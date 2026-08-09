@@ -38,6 +38,22 @@ module "site" {
 }
 ```
 
+### Access logging
+
+Set `enable_logging = true` to create a dedicated S3 bucket for CloudFront
+access logs and turn on delivery to it. Logs land under the `cloudfront/`
+prefix and expire automatically after 90 days. It's off by default so the
+module doesn't provision an extra bucket for consumers who don't want one:
+
+```hcl
+module "site" {
+  source = "github.com/ryankidd/terraform-aws-static-site"
+
+  bucket_name    = "my-static-site"
+  enable_logging = true
+}
+```
+
 See [`examples/`](examples) for complete, runnable configurations.
 
 ## Inputs
@@ -50,6 +66,7 @@ See [`examples/`](examples) for complete, runnable configurations.
 | `price_class` | CloudFront price class controlling which edge locations serve the distribution. | `string` | `"PriceClass_100"` |
 | `domain_aliases` | Custom domain names (CNAMEs) the distribution should respond to. Requires `acm_certificate_arn`. | `list(string)` | `[]` |
 | `acm_certificate_arn` | ARN of an existing ACM certificate covering `domain_aliases`, issued in `us-east-1`. | `string` | `null` |
+| `enable_logging` | Whether to create an S3 bucket for CloudFront access logs and enable logging on the distribution. | `bool` | `false` |
 
 ## Outputs
 
@@ -59,3 +76,4 @@ See [`examples/`](examples) for complete, runnable configurations.
 | `bucket_arn` | ARN of the S3 bucket storing site content. |
 | `distribution_id` | ID of the CloudFront distribution. |
 | `distribution_domain_name` | Domain name of the CloudFront distribution. |
+| `logs_bucket_id` | ID of the S3 bucket storing CloudFront access logs, if `enable_logging` is true. |
