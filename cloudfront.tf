@@ -35,6 +35,15 @@ resource "aws_cloudfront_distribution" "site" {
     }
   }
 
+  dynamic "logging_config" {
+    for_each = var.enable_logging ? [1] : []
+
+    content {
+      bucket = aws_s3_bucket.logs[0].bucket_domain_name
+      prefix = "cloudfront/"
+    }
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"

@@ -37,3 +37,9 @@ variable "acm_certificate_arn" {
   type        = string
   default     = null
 }
+
+variable "enable_logging" {
+  description = "Whether to create an S3 bucket for CloudFront access logs and enable logging on the distribution."
+  type        = bool
+  default     = false
+}
