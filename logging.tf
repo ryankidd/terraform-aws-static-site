@@ -14,6 +14,22 @@ resource "aws_s3_bucket_public_access_block" "logs" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  count  = var.enable_logging ? 1 : 0
+  bucket = aws_s3_bucket.logs[0].id
+
+  rule {
+    id     = "expire-access-logs"
+    status = "Enabled"
+
+    filter {}
+
+    expiration {
+      days = 90
+    }
+  }
+}
+
 # CloudFront's standard access logging still delivers via an S3 ACL grant,
 # so the destination bucket needs ACLs enabled rather than the
 # bucket-owner-enforced default.
