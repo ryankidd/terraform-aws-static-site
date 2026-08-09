@@ -11,6 +11,10 @@ data "aws_cloudfront_response_headers_policy" "security_headers" {
 }
 
 resource "aws_cloudfront_distribution" "site" {
+  #checkov:skip=CKV_AWS_68:WAF is a paid add-on out of scope for this module; attach a WAF web ACL to the distribution ARN outside the module if needed.
+  #checkov:skip=CKV_AWS_310:Single S3 origin by design; origin failover would need a second origin this module doesn't create.
+  #checkov:skip=CKV_AWS_374:No geo restriction by default is intentional so the site is reachable from anywhere; set restrictions per deployment if needed.
+  #checkov:skip=CKV2_AWS_47:No WAF is attached (see CKV_AWS_68), so there's no web ACL to configure an AMR rule on.
   enabled             = true
   default_root_object = var.default_root_object
   price_class         = var.price_class
