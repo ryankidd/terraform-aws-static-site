@@ -19,8 +19,10 @@ module "site" {
 Early and under active development. Currently provisions a private S3
 bucket (versioned, public access blocked) fronted by a CloudFront
 distribution using Origin Access Control, so the bucket stays private and
-is only readable through CloudFront. Custom domains are supported by
-passing an existing ACM certificate; CI is in progress.
+is only readable through CloudFront. A managed response headers policy
+adds baseline security headers by default. Custom domains and CloudFront
+access logging are both supported and variable-gated. CI runs formatting,
+validation, linting, and a Checkov security scan on every push.
 
 ### Custom domain
 
